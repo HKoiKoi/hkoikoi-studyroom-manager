@@ -1,0 +1,44 @@
+server:
+  port: 8080
+  forward-headers-strategy: native
+
+spring:
+  application:
+    name: Studyroom-Manager
+
+  profiles:
+    active: dev
+
+  # ----------------------------------------
+  # Database (App - CRUD Only)
+  # ----------------------------------------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_APP_USER}
+    password: ${MYSQL_APP_PASSWORD}
+    hikari:
+      pool-name: ToeicMasterHikariPool
+      maximum-pool-size: 10
+
+  # ----------------------------------------
+  # Database (Migration - DDL Only)
+  # ----------------------------------------
+  flyway:
+    enabled: true
+    user: ${MYSQL_FLYWAY_USER}
+    password: ${MYSQL_FLYWAY_PASSWORD}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # ----------------------------------------
+  # JPA / Hibernate
+  # ----------------------------------------
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100

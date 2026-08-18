@@ -1,0 +1,19 @@
+spring:
+  # ----------------------------------------
+  # JPA / Hibernate
+  # ----------------------------------------
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+# ----------------------------------------
+# Logging
+# ----------------------------------------
+logging:
+  level:
+    root: info
+    com.hkoikoi.studyroomManager: debug
+    org.flywaydb: info

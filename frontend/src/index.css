@@ -1,0 +1,11 @@
+/* 프리텐다드 웹폰트 임포트 */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/* Tailwind v4 기본 설정 및 DaisyUI 플러그인 추가 */
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* 커스텀 테마 설정 (기존 theme.extend 역할을 함) */
+@theme {
+  --font-sans: "Pretendard", sans-serif;
+}
