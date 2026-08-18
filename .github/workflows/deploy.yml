@@ -1,0 +1,33 @@
+name: HKoiKoi's Studyroom Manager Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  WORKSPACE_DIR: ${{vars.WORKSPACE_DIR}}
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: 1. 최신 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: 2. Workspace 디렉터리로 코드 동기화
+        run: |
+          echo "Workspace 디렉터리가 없으면 생성합니다..."
+          mkdir -p $WORKSPACE_DIR
+
+          echo "현재 러너가 받은 최신 코드를 Workspace 디렉터리로 동기화합니다..."
+          # 현재 빌드 중인 디렉터리(.)의 모든 파일을 Workspace 디렉터리로 복사
+          rsync -av --exclude='.env' ./ $WORKSPACE_DIR/
+
+      - name: 3. Docker Compose를 사용하여 컨테이너 배포
+        run: |
+          cd $WORKSPACE_DIR
+
+          echo "Docker Compose를 사용하여 컨테이너를 배포합니다..."
+          docker-compose up -d --build
