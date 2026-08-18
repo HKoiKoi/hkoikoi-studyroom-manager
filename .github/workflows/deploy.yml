@@ -30,4 +30,4 @@ jobs:
           cd $WORKSPACE_DIR
 
           echo "Docker Compose를 사용하여 컨테이너를 배포합니다..."
-          docker-compose up -d --build
+          docker-compose -p studyroom-manager up -d --build
