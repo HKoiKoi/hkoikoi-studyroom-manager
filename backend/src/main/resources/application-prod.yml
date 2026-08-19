@@ -10,6 +10,13 @@ spring:
         use_sql_comments: false
 
 # ----------------------------------------
+# Cors
+# ----------------------------------------
+app:
+  cors:
+    allowed-origins: "https://sco.hkoikoi.dev, https://www.sco.hkoikoi.dev"
+
+# ----------------------------------------
 # Logging
 # ----------------------------------------
 logging:

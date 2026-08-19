@@ -18,8 +18,9 @@ repositories {
 }
 
 dependencies {
-    // Web
+    // Web & Core
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // Database & JPA
     runtimeOnly("com.mysql:mysql-connector-j")
@@ -33,6 +34,9 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")
+
+    // API Spec
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.0")
 
     // Test Environment
     testCompileOnly("org.projectlombok:lombok")
