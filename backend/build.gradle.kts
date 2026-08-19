@@ -35,6 +35,9 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")
 
+    // API Spec
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.0")
+
     // Test Environment
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
