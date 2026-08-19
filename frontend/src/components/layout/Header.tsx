@@ -29,7 +29,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-base-100/90 backdrop-blur-md border-b border-base-200 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-1/6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-13 flex items-center justify-between">
         {/* 로고 및 메인 네비게이션 */}
         <div className="flex items-center gap-6 sm:gap-8">
           <Link to="/" className="flex items-center gap-2 group">
@@ -39,7 +39,7 @@ export const Header = () => {
               className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-full border border-base-300 group-hover:scale-105 transition-transform"
             />
             <span className="font-extrabold text-lg sm:text-xl tracking-tight text-base-content group-hover:text-primary transition-colors">
-              SCO 순찰 일지
+              HKoiKoi's SCO 순찰 일지
             </span>
           </Link>
 

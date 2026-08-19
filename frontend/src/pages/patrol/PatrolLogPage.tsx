@@ -103,7 +103,7 @@ export const PatrolLogPage = () => {
       </section>
 
       {/* 입력 폼 영역 */}
-      <section className="flex flex-col gap-6 max-w-3xl w-full mx-auto">
+      <section className="flex flex-col gap-6">
         {/* 1. 좌석 점검 카드 */}
         <div className="card bg-base-100 border border-base-200 shadow-xs">
           <div className="card-body p-5 sm:p-8 flex flex-col gap-6">

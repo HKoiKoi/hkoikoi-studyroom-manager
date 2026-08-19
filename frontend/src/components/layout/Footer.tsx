@@ -15,12 +15,12 @@ export const Footer = () => {
               SCO 순찰 일지
             </span>
             <p className="text-xs sm:text-sm leading-relaxed opacity-80 mt-1">
-              효율적이고 체계적인 순찰 일지 관리 서비스를 제공합니다.
+              효율적이고 체계적인 순찰 일지 관리 시스템.
               <br />
               순찰 일지 기록을 통해 쾌적한 근무 환경을 유지하세요.
             </p>
             <p className="text-xs opacity-50 mt-2 sm:mt-4">
-              © {currentYear} Studyroom Manager. All rights reserved.
+              © {currentYear} HKoiKoi. All rights reserved.
             </p>
           </aside>
 
