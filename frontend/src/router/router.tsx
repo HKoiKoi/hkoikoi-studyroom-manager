@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PatrolLogPage } from "@/pages/patrol/PatrolLogPage";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -10,6 +11,10 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/patrol/new" replace /> },
 
       // TODO: 순찰 일지 라우트
+      {
+        path: "/patrol/new",
+        element: <PatrolLogPage />,
+      },
 
       // TODO: 404 에러 페이지
     ],
