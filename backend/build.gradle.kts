@@ -18,8 +18,9 @@ repositories {
 }
 
 dependencies {
-    // Web
+    // Web & Core
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // Database & JPA
     runtimeOnly("com.mysql:mysql-connector-j")
