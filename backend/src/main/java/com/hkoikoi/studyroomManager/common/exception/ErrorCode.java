@@ -18,6 +18,11 @@ public enum ErrorCode {
 	INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON_001", "입력값이 올바르지 않습니다."),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_002", "서버 내부 오류가 발생했습니다."),
 	METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_003", "지원하지 않는 HTTP Method 형식입니다."),
+
+	// ----------------------------------------
+	// 순찰 일지 (PatrolLog) 에러
+	// ----------------------------------------
+	NOT_FOUND_PATROL_LOG(HttpStatus.NOT_FOUND, "PATROL_001", "존재하지 않는 순찰 일지입니다."),
 	;
 
 	HttpStatus status;

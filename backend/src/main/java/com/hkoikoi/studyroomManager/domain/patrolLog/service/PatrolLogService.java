@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hkoikoi.studyroomManager.common.exception.BusinessException;
+import com.hkoikoi.studyroomManager.common.exception.ErrorCode;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogCreateRequest;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogResponse;
 import com.hkoikoi.studyroomManager.domain.patrolLog.entity.PatrolLog;
@@ -33,6 +35,14 @@ public class PatrolLogService {
 		return patrolLogs.stream()
 			.map(PatrolLogResponse::from)
 			.toList();
+	}
+
+	public PatrolLogResponse getPatrolLog(Long patrolLogId) {
+
+		PatrolLog patrolLog = patrolLogRepository.findById(patrolLogId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PATROL_LOG));
+
+		return PatrolLogResponse.from(patrolLog);
 	}
 
 	@Transactional

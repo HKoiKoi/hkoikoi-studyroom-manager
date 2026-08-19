@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,12 @@ public class PatrolLogController {
 
 		return ApiResponse.success(patrolLogService.getPatrolLogsByDate(targetDate));
 	}
-	
+
+	@GetMapping("/{patrolLogId}")
+	public ApiResponse<PatrolLogResponse> getPatrolLog(@PathVariable Long patrolLogId) {
+		return ApiResponse.success(patrolLogService.getPatrolLog(patrolLogId));
+	}
+
 	@PostMapping
 	public ApiResponse<Long> createPatrolLog(@RequestBody PatrolLogCreateRequest request) {
 		return ApiResponse.success(patrolLogService.createPatrolLog(request));
