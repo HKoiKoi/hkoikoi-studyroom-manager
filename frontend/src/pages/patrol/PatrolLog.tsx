@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alertUtils } from "@/utils/alertUtils";
-import { patrolLogApi } from "@/api/patrolLogApi";
 import type { ErrorResponse } from "@/types/common";
+import { useCreatePatrolLog } from "@/hooks/usePatrolLog";
 import type { PatrolLogCreateRequest } from "@/types/patrolLog";
 import { SeatTagInput } from "@/components/patrol/SeatTagInput";
 import {
@@ -21,6 +21,7 @@ import {
 
 export const PatrolLogPage = () => {
   const navigate = useNavigate();
+  const { mutateAsync: createPatrolLog, isPending } = useCreatePatrolLog();
 
   // 상태 관리
   const [standingSeats, setStandingSeats] = useState<number[]>([]);
@@ -28,7 +29,6 @@ export const PatrolLogPage = () => {
   const [drowsySeats, setDrowsySeats] = useState<number[]>([]);
   const [absentSeats, setAbsentSeats] = useState<number[]>([]);
   const [memo, setMemo] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -87,13 +87,10 @@ export const PatrolLogPage = () => {
     };
 
     try {
-      setIsLoading(true);
-
-      const response = await patrolLogApi.createPatrolLog(requestData);
+      const response = await createPatrolLog(requestData);
 
       if (response.result) {
         alertUtils.toastSuccess("순찰 일지가 성공적으로 저장되었습니다.");
-
         navigate("/patrol");
       }
     } catch (error: unknown) {
@@ -102,8 +99,6 @@ export const PatrolLogPage = () => {
         "저장 실패",
         err.message || "서버 통신 오류가 발생했습니다.",
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -129,6 +124,7 @@ export const PatrolLogPage = () => {
         </div>
       </section>
 
+      {/* 순찰 일지 작성 날짜 및 시간 */}
       <section className="flex justify-center w-full">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-base-100 shadow-sm border border-base-200 px-6 py-4 rounded-box w-full">
           <div className="flex items-center gap-2 text-lg sm:text-xl font-bold text-base-content/90">
@@ -196,7 +192,7 @@ export const PatrolLogPage = () => {
               특이사항 및 점검항목
             </h2>
 
-            {/* 빠른 추가 버튼 (Routine Tasks) */}
+            {/* 빠른 추가 버튼 */}
             <div className="flex flex-wrap gap-2 mb-2">
               {routineTasks.map((task) => (
                 <button
@@ -224,15 +220,15 @@ export const PatrolLogPage = () => {
         <div className="mt-4 flex justify-end">
           <button
             onClick={handleSave}
-            disabled={isLoading}
+            disabled={isPending}
             className="btn btn-primary w-full sm:w-auto px-8 gap-2 text-lg h-12"
           >
-            {isLoading ? (
+            {isPending ? (
               <span className="loading loading-spinner loading-sm"></span>
             ) : (
               <Save size={20} />
             )}
-            {isLoading ? "저장 중..." : "순찰 일지 등록"}
+            {isPending ? "저장 중..." : "순찰 일지 등록"}
           </button>
         </div>
       </section>
