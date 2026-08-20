@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { X, type LucideIcon } from "lucide-react";
-import { useState, type KeyboardEvent } from "react";
 
 interface SeatTagInputProps {
   label: string;
@@ -18,17 +18,16 @@ export const SeatTagInput = ({
 }: SeatTagInputProps) => {
   const [inputValue, setInputValue] = useState<string>("");
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-      e.preventDefault();
-      const num = parseInt(inputValue.trim(), 10);
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!isNaN(num) && !seats.includes(num)) {
-        onChange([...seats, num]);
-      }
+    const num = parseInt(inputValue.trim(), 10);
 
-      setInputValue("");
+    if (!isNaN(num) && !seats.includes(num)) {
+      onChange([...seats, num]);
     }
+
+    setInputValue("");
   };
 
   const removeSeat = (targetSeat: number) => {
@@ -42,14 +41,20 @@ export const SeatTagInput = ({
         {label}
       </label>
 
-      <input
-        type="number"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={`${label} 번호 입력 후 Enter`}
-        className="input input-sm sm:input-md input-bordered w-full focus:input-primary transition-all"
-      />
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="number"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder={`${label} 번호 입력 후 Enter`}
+          className="input input-sm sm:input-md input-bordered w-full focus:input-primary transition-all"
+          enterKeyHint="done"
+        />
+        {/* 폼 제출을 위한 숨김 버튼 */}
+        <button type="submit" className="hidden" aria-hidden="true">
+          추가
+        </button>
+      </form>
 
       {seats.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-1">
