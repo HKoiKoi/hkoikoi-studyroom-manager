@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
-import { PatrolLogPage } from "@/pages/patrol/PatrolLogPage";
+import { PatrolLogPage } from "@/pages/patrol/PatrolLog";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
