@@ -1,20 +1,20 @@
-import { SeatBadgeList } from "@/components/patrol/SeatBadgeList";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { usePatrolLogs } from "@/hooks/usePatrolLog";
 import type { PatrolLogResponse } from "@/types/patrolLog";
+import { SeatBadgeList } from "@/components/patrol/SeatBadgeList";
 import {
-  Armchair,
-  Calendar,
-  ClipboardList,
+  Moon,
+  Plus,
   Clock,
   Coffee,
   FileText,
-  Moon,
-  Plus,
   Sparkles,
+  Armchair,
+  Calendar,
   UserMinus,
+  ClipboardList,
 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const PatrolLogList = () => {
   const navigate = useNavigate();
@@ -52,9 +52,9 @@ export const PatrolLogList = () => {
               <Sparkles className="text-warning w-5 h-5 sm:w-7 sm:h-7" />
             </h1>
             <p className="py-3 sm:py-4 text-base-content/70 text-xs sm:text-base leading-relaxed">
-              매장의 순찰 점검 기록을 확인합니다.
+              독서실의 순찰 점검 기록을 확인합니다.
               <br className="hidden sm:inline" />
-              날짜별로 꼼꼼하게 기록된 데이터를 조회해보세요.
+              날짜별로 기록된 데이터를 조회해보세요.
             </p>
           </div>
         </div>
