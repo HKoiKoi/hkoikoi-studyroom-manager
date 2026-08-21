@@ -29,6 +29,15 @@ export const patrolLogApi = {
     return response.data;
   },
 
+  // 당일 가장 최근 순찰 일지 조회
+  getRecentPatrolLog: async (): Promise<ApiResponse<PatrolLogResponse>> => {
+    const response = await apiClient.get<ApiResponse<PatrolLogResponse>>(
+      "/api/v1/patrol-logs/recent",
+    );
+
+    return response.data;
+  },
+
   // 순찰 일지 생성
   createPatrolLog: async (
     request: PatrolLogCreateRequest,

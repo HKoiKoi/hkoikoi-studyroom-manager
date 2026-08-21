@@ -41,6 +41,11 @@ public class PatrolLogController {
 		return ApiResponse.success(patrolLogService.getPatrolLog(patrolLogId));
 	}
 
+	@GetMapping("/recent")
+	public ApiResponse<PatrolLogResponse> getRecentPatrolLog() {
+		return ApiResponse.success(patrolLogService.getRecentPatrolLog());
+	}
+
 	@PostMapping
 	public ApiResponse<Long> createPatrolLog(@RequestBody PatrolLogCreateRequest request) {
 		return ApiResponse.success(patrolLogService.createPatrolLog(request));
