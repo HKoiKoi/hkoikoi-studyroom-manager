@@ -6,6 +6,7 @@ interface SeatBadgeListProps {
   icon: LucideIcon | React.ElementType;
   seats?: number[];
   badgeColor: string;
+  onClickSeat?: (seat: number) => void;
 }
 
 export const SeatBadgeList = ({
@@ -13,8 +14,11 @@ export const SeatBadgeList = ({
   icon: Icon,
   seats,
   badgeColor,
+  onClickSeat,
 }: SeatBadgeListProps) => {
-  if (!seats || seats.length === 0) return null;
+  if (!seats || seats.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -26,7 +30,12 @@ export const SeatBadgeList = ({
         {seats.map((seat) => (
           <span
             key={seat}
-            className={`badge ${badgeColor} font-semibold shadow-sm`}
+            onClick={() => onClickSeat && onClickSeat(seat)}
+            className={`badge ${badgeColor} font-semibold shadow-sm ${
+              onClickSeat
+                ? "cursor-pointer hover:opacity-75 hover:scale-105 transition-all"
+                : ""
+            }`}
           >
             {seat}번
           </span>

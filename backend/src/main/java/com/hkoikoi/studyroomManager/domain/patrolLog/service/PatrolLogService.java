@@ -3,6 +3,7 @@ package com.hkoikoi.studyroomManager.domain.patrolLog.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.hkoikoi.studyroomManager.common.exception.BusinessException;
 import com.hkoikoi.studyroomManager.common.exception.ErrorCode;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogCreateRequest;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogResponse;
+import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogSeatMoveRequest;
 import com.hkoikoi.studyroomManager.domain.patrolLog.entity.PatrolLog;
 import com.hkoikoi.studyroomManager.domain.patrolLog.repository.PatrolLogRepository;
 
@@ -70,5 +72,31 @@ public class PatrolLogService {
 		PatrolLog savedPatrolLog = patrolLogRepository.save(patrolLog);
 
 		return savedPatrolLog.getId();
+	}
+
+	@Transactional
+	public void moveAbsentSeat(Long patrolLogId, PatrolLogSeatMoveRequest request) {
+
+		PatrolLog patrolLog = patrolLogRepository.findById(patrolLogId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PATROL_LOG));
+
+		patrolLog.getAbsentSeats().remove(request.seatNumber());
+
+		switch (request.targetZone()) {
+
+			case STANDING -> {
+				if (!patrolLog.getStandingSeats().contains(request.seatNumber())) {
+					patrolLog.getStandingSeats().add(request.seatNumber());
+					Collections.sort(patrolLog.getStandingSeats());
+				}
+			}
+
+			case CAFE_ZONE -> {
+				if (!patrolLog.getCafeZoneSeats().contains(request.seatNumber())) {
+					patrolLog.getCafeZoneSeats().add(request.seatNumber());
+					Collections.sort(patrolLog.getCafeZoneSeats());
+				}
+			}
+		}
 	}
 }
