@@ -23,7 +23,7 @@ export const SeatTagInput = ({
 
     const num = parseInt(inputValue.trim(), 10);
 
-    if (!isNaN(num) && !seats.includes(num)) {
+    if (!isNaN(num) && num > 0 && !seats.includes(num)) {
       const sortedSeats = [...seats, num].sort((a, b) => a - b);
       onChange(sortedSeats);
     }
@@ -45,6 +45,7 @@ export const SeatTagInput = ({
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="number"
+          min="1"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={`${label} 번호 입력 후 Enter`}
