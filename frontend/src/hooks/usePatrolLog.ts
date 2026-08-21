@@ -1,5 +1,8 @@
 import { patrolLogApi } from "@/api/patrolLogApi";
-import type { PatrolLogCreateRequest } from "@/types/patrolLog";
+import type {
+  PatrolLogCreateRequest,
+  PatrolLogSeatMoveRequest,
+} from "@/types/patrolLog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // 쿼리 키 팩토리
@@ -45,6 +48,24 @@ export const useCreatePatrolLog = () => {
   return useMutation({
     mutationFn: (data: PatrolLogCreateRequest) =>
       patrolLogApi.createPatrolLog(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: patrolLogKeys.all });
+    },
+  });
+};
+
+// 좌석 이동 훅
+export const useMoveAbsentSeat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      patrolLogId,
+      request,
+    }: {
+      patrolLogId: number;
+      request: PatrolLogSeatMoveRequest;
+    }) => patrolLogApi.moveAbsentSeat(patrolLogId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: patrolLogKeys.all });
     },
