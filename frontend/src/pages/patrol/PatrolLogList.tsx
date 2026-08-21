@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { usePatrolLogs } from "@/hooks/usePatrolLog";
-import type { PatrolLogResponse } from "@/types/patrolLog";
+import { useMoveAbsentSeat, usePatrolLogs } from "@/hooks/usePatrolLog";
+import type { PatrolLogResponse, ZoneType } from "@/types/patrolLog";
 import { SeatBadgeList } from "@/components/patrol/SeatBadgeList";
 import {
   Moon,
@@ -15,6 +15,7 @@ import {
   UserMinus,
   ClipboardList,
 } from "lucide-react";
+import { alertUtils } from "@/utils/alertUtils";
 
 export const PatrolLogList = () => {
   const navigate = useNavigate();
@@ -24,8 +25,15 @@ export const PatrolLogList = () => {
     new Date().toISOString().split("T")[0],
   );
 
+  const [selectedSeat, setSelectedSeat] = useState<{
+    logId: number;
+    seatNumber: number;
+  } | null>(null);
+
   // API 훅
   const { data: response, isLoading, isError } = usePatrolLogs(selectedDate);
+  const { mutateAsync: moveAbsentSeat, isPending: isMoving } =
+    useMoveAbsentSeat();
 
   const patrolLogs = response?.data || [];
 
@@ -36,6 +44,34 @@ export const PatrolLogList = () => {
       minute: "2-digit",
       hour12: false,
     }).format(new Date(isoString));
+  };
+
+  // 좌석 클릭 핸들러
+  const handleAbsentSeatClick = (logId: number, seatNumber: number) => {
+    setSelectedSeat({ logId, seatNumber });
+  };
+
+  // 좌석 이동 처리
+  const handleMoveSeat = async (targetZone: ZoneType) => {
+    if (!selectedSeat) return;
+
+    try {
+      await moveAbsentSeat({
+        patrolLogId: selectedSeat.logId,
+        request: {
+          seatNumber: selectedSeat.seatNumber,
+          targetZone,
+        },
+      });
+
+      alertUtils.toastSuccess(
+        `${selectedSeat.seatNumber}번 좌석이 이동되었습니다.`,
+      );
+      setSelectedSeat(null);
+    } catch (error) {
+      console.error("좌석 이동 처리 중 오류 발생:", error);
+      alertUtils.error("이동 실패", "좌석 이동 처리 중 문제가 발생했습니다.");
+    }
   };
 
   return (
@@ -144,6 +180,9 @@ export const PatrolLogList = () => {
                     icon={UserMinus}
                     seats={log.absentSeats}
                     badgeColor="badge-error text-white"
+                    onClickSeat={(seatNumber) =>
+                      handleAbsentSeatClick(log.patrolLogId, seatNumber)
+                    }
                   />
                 </div>
 
@@ -163,6 +202,54 @@ export const PatrolLogList = () => {
             </div>
           ))}
       </section>
+
+      {/* 좌석 이동 모달 */}
+      {selectedSeat && (
+        <div className="modal modal-open modal-bottom sm:modal-middle">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4 text-center">
+              <span className="text-error">{selectedSeat.seatNumber}번</span>{" "}
+              좌석 이동
+            </h3>
+            <p className="py-2 text-center text-sm text-base-content/70 mb-4">
+              해당 학생이 현재 이용 중인 좌석을 선택해주세요.
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                className="btn btn-primary"
+                onClick={() => handleMoveSeat("STANDING")}
+                disabled={isMoving}
+              >
+                <Armchair size={18} /> 스탠딩으로 이동
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleMoveSeat("CAFE_ZONE")}
+                disabled={isMoving}
+              >
+                <Coffee size={18} /> 카페존으로 이동
+              </button>
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn w-full"
+                onClick={() => setSelectedSeat(null)}
+                disabled={isMoving}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+
+          {/* 모달 바깥 영역 클릭 시 닫기 */}
+          <div
+            className="modal-backdrop"
+            onClick={() => setSelectedSeat(null)}
+          ></div>
+        </div>
+      )}
     </div>
   );
 };

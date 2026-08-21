@@ -1,7 +1,7 @@
 package com.hkoikoi.studyroomManager.common.converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +31,12 @@ public class IntegerListConverter implements AttributeConverter<List<Integer>, S
 	public List<Integer> convertToEntityAttribute(String dbData) {
 
 		if (!StringUtils.hasText(dbData)) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		return Arrays.stream(dbData.split(SPLIT_CHAR))
 			.map(String::trim)
 			.map(Integer::valueOf)
-			.toList();
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

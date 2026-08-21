@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hkoikoi.studyroomManager.common.dto.ApiResponse;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogCreateRequest;
 import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogResponse;
+import com.hkoikoi.studyroomManager.domain.patrolLog.dto.PatrolLogSeatMoveRequest;
 import com.hkoikoi.studyroomManager.domain.patrolLog.service.PatrolLogService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,8 +43,24 @@ public class PatrolLogController {
 		return ApiResponse.success(patrolLogService.getPatrolLog(patrolLogId));
 	}
 
+	@GetMapping("/recent")
+	public ApiResponse<PatrolLogResponse> getRecentPatrolLog() {
+		return ApiResponse.success(patrolLogService.getRecentPatrolLog());
+	}
+
 	@PostMapping
 	public ApiResponse<Long> createPatrolLog(@RequestBody PatrolLogCreateRequest request) {
 		return ApiResponse.success(patrolLogService.createPatrolLog(request));
+	}
+
+	@PatchMapping("/{patrolLogId}/move-absent-seat")
+	public ApiResponse<Void> moveAbsentSeat(
+		@PathVariable Long patrolLogId,
+		@RequestBody PatrolLogSeatMoveRequest request
+	) {
+
+		patrolLogService.moveAbsentSeat(patrolLogId, request);
+
+		return ApiResponse.success();
 	}
 }

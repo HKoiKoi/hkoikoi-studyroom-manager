@@ -3,6 +3,7 @@ import type { ApiResponse } from "@/types/common";
 import type {
   PatrolLogResponse,
   PatrolLogCreateRequest,
+  PatrolLogSeatMoveRequest,
 } from "@/types/patrolLog";
 
 export const patrolLogApi = {
@@ -29,6 +30,15 @@ export const patrolLogApi = {
     return response.data;
   },
 
+  // 당일 가장 최근 순찰 일지 조회
+  getRecentPatrolLog: async (): Promise<ApiResponse<PatrolLogResponse>> => {
+    const response = await apiClient.get<ApiResponse<PatrolLogResponse>>(
+      "/api/v1/patrol-logs/recent",
+    );
+
+    return response.data;
+  },
+
   // 순찰 일지 생성
   createPatrolLog: async (
     request: PatrolLogCreateRequest,
@@ -39,5 +49,16 @@ export const patrolLogApi = {
     );
 
     return response.data;
+  },
+
+  // 좌석 이동
+  moveAbsentSeat: async (
+    patrolLogId: number,
+    request: PatrolLogSeatMoveRequest,
+  ): Promise<void> => {
+    await apiClient.patch(
+      `/api/v1/patrol-logs/${patrolLogId}/move-absent-seat`,
+      request,
+    );
   },
 };

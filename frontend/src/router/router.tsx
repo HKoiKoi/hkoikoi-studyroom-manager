@@ -1,8 +1,8 @@
 import NotFound from "@/pages/NotFound";
 import { Layout } from "@/components/layout/Layout";
-import { PatrolLogPage } from "@/pages/patrol/PatrolLog";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { PatrolLog } from "@/pages/patrol/PatrolLog";
 import { PatrolLogList } from "@/pages/patrol/PatrolLogList";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
   {
@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/patrol/new",
-        element: <PatrolLogPage />,
+        element: <PatrolLog />,
       },
 
       // TODO: 404 에러 페이지
