@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { alertUtils } from "@/utils/alertUtils";
 import type { ErrorResponse } from "@/types/common";
+import { useRef, useEffect, useState } from "react";
 import { useCreatePatrolLog } from "@/hooks/usePatrolLog";
 import { SeatTagInput } from "@/components/patrol/SeatTagInput";
 import type {
@@ -26,35 +26,80 @@ interface PatrolLogFormProps {
   recentData?: PatrolLogResponse | null;
 }
 
+const DRAFT_KEY = "patrol_log_draft";
+
 export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
   const navigate = useNavigate();
   const { mutateAsync: createPatrolLog, isPending } = useCreatePatrolLog();
 
+  // 로컬 스토리지에서 저장된 임시저장 데이터 불러오기
+  const savedDraft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+
   // 상태 관리
   const [standingSeats, setStandingSeats] = useState<number[]>(() => {
+    if (savedDraft?.standingSeats) {
+      return savedDraft.standingSeats;
+    }
+
     const seats = recentData?.standingSeats || [];
+
     return [...seats].sort((a, b) => a - b);
   });
   const [cafeZoneSeats, setCafeZoneSeats] = useState<number[]>(() => {
+    if (savedDraft?.cafeZoneSeats) {
+      return savedDraft.cafeZoneSeats;
+    }
+
     const seats = recentData?.cafeZoneSeats || [];
+
     return [...seats].sort((a, b) => a - b);
   });
-  const [drowsySeats, setDrowsySeats] = useState<number[]>([]);
-  const [absentSeats, setAbsentSeats] = useState<number[]>([]);
-  const [memo, setMemo] = useState<string>("");
+  const [drowsySeats, setDrowsySeats] = useState<number[]>(
+    savedDraft?.drowsySeats || [],
+  );
+  const [absentSeats, setAbsentSeats] = useState<number[]>(
+    savedDraft?.absentSeats || [],
+  );
+  const [memo, setMemo] = useState<string>(savedDraft?.memo || "");
   const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
 
-  useEffect(() => {
-    const hasSeats =
-      (recentData?.standingSeats && recentData.standingSeats.length > 0) ||
-      (recentData?.cafeZoneSeats && recentData.cafeZoneSeats.length > 0);
+  const isDraftRestored = !!savedDraft;
+  const hasRecentSeats = !!(
+    (recentData?.standingSeats && recentData.standingSeats.length > 0) ||
+    (recentData?.cafeZoneSeats && recentData.cafeZoneSeats.length > 0)
+  );
+  const hasNotified = useRef(false);
+  const isSubmitted = useRef(false);
 
-    if (hasSeats) {
+  // 페이지 로드 시 임시저장 데이터가 존재하면 불러왔다는 알림, 이전 순찰 일지의 좌석 데이터가 있다면 직전 순찰 일지의 좌석 데이터를 불러왔다는 알림을 한 번만 표시
+  useEffect(() => {
+    if (hasNotified.current) return;
+
+    if (isDraftRestored) {
+      alertUtils.toastSuccess("작성 중이던 일지를 불러왔습니다.");
+    } else if (hasRecentSeats) {
       alertUtils.toastSuccess(
         "직전 순찰 일지의 스탠딩, 카페존 좌석을 불러왔습니다.",
       );
     }
-  }, [recentData]);
+
+    hasNotified.current = true;
+  }, [isDraftRestored, hasRecentSeats]);
+
+  // 임시저장 기능: 상태가 변경될 때마다 로컬 스토리지에 저장
+  useEffect(() => {
+    if (isSubmitted.current) return;
+
+    const draftData = {
+      standingSeats,
+      cafeZoneSeats,
+      drowsySeats,
+      absentSeats,
+      memo,
+    };
+
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+  }, [standingSeats, cafeZoneSeats, drowsySeats, absentSeats, memo]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -117,6 +162,9 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
       const response = await createPatrolLog(requestData);
 
       if (response.result) {
+        isSubmitted.current = true;
+        localStorage.removeItem(DRAFT_KEY);
+
         alertUtils.toastSuccess("순찰 일지가 성공적으로 저장되었습니다.");
         navigate("/patrol");
       }
@@ -203,7 +251,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
                 icon={UserMinus}
                 seats={absentSeats}
                 onChange={setAbsentSeats}
-                badgeColor="badge-error text-white"
+                badgeColor="badge-accent"
               />
             </div>
           </div>
