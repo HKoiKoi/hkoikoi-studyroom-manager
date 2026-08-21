@@ -3,7 +3,6 @@ package com.hkoikoi.studyroomManager.domain.patrolLog.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -80,23 +79,11 @@ public class PatrolLogService {
 		PatrolLog patrolLog = patrolLogRepository.findById(patrolLogId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PATROL_LOG));
 
-		patrolLog.getAbsentSeats().remove(request.seatNumber());
+		patrolLog.removeAbsentSeat(request.seatNumber());
 
 		switch (request.targetZone()) {
-
-			case STANDING -> {
-				if (!patrolLog.getStandingSeats().contains(request.seatNumber())) {
-					patrolLog.getStandingSeats().add(request.seatNumber());
-					Collections.sort(patrolLog.getStandingSeats());
-				}
-			}
-
-			case CAFE_ZONE -> {
-				if (!patrolLog.getCafeZoneSeats().contains(request.seatNumber())) {
-					patrolLog.getCafeZoneSeats().add(request.seatNumber());
-					Collections.sort(patrolLog.getCafeZoneSeats());
-				}
-			}
+			case STANDING -> patrolLog.addStandingSeat(request.seatNumber());
+			case CAFE_ZONE -> patrolLog.addCafeZoneSeat(request.seatNumber());
 		}
 	}
 }

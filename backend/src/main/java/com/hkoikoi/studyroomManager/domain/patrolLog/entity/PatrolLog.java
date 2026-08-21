@@ -2,6 +2,7 @@ package com.hkoikoi.studyroomManager.domain.patrolLog.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -77,5 +78,38 @@ public class PatrolLog {
 		patrolLog.memo = memo;
 
 		return patrolLog;
+	}
+
+	public void removeAbsentSeat(Integer seatNumber) {
+
+		List<Integer> newAbsentSeats = new ArrayList<>(this.absentSeats);
+
+		newAbsentSeats.remove(seatNumber);
+
+		this.absentSeats = newAbsentSeats;
+	}
+
+	public void addStandingSeat(Integer seatNumber) {
+
+		List<Integer> newStandingSeats = new ArrayList<>(this.standingSeats);
+
+		if (!newStandingSeats.contains(seatNumber)) {
+			newStandingSeats.add(seatNumber);
+			Collections.sort(newStandingSeats);
+		}
+
+		this.standingSeats = newStandingSeats;
+	}
+
+	public void addCafeZoneSeat(Integer seatNumber) {
+
+		List<Integer> newCafeZoneSeats = new ArrayList<>(this.cafeZoneSeats);
+
+		if (!newCafeZoneSeats.contains(seatNumber)) {
+			newCafeZoneSeats.add(seatNumber);
+			Collections.sort(newCafeZoneSeats);
+		}
+
+		this.cafeZoneSeats = newCafeZoneSeats;
 	}
 }
