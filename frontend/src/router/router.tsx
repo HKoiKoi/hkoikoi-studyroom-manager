@@ -1,8 +1,8 @@
 import NotFound from "@/pages/NotFound";
 import { Layout } from "@/components/layout/Layout";
 import { PatrolLog } from "@/pages/patrol/PatrolLog";
-import { createBrowserRouter, Navigate } from "react-router-dom";
 import { PatrolLogList } from "@/pages/patrol/PatrolLogList";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
   {
