@@ -9,6 +9,7 @@ export const patrolLogKeys = {
   list: (date?: string) => [...patrolLogKeys.lists(), date] as const,
   details: () => [...patrolLogKeys.all, "detail"] as const,
   detail: (id: number) => [...patrolLogKeys.details(), id] as const,
+  recent: () => [...patrolLogKeys.all, "recent"] as const,
 };
 
 // 순찰 일지 목록 조회 훅
@@ -26,6 +27,14 @@ export const usePatrolLog = (patrolLogId: number) => {
     queryKey: patrolLogKeys.detail(patrolLogId),
     queryFn: () => patrolLogApi.getPatrolLog(patrolLogId),
     enabled: !!patrolLogId,
+  });
+};
+
+// 당일 가장 최근 순찰 일지 조회
+export const useRecentPatrolLog = () => {
+  return useQuery({
+    queryKey: patrolLogKeys.recent(),
+    queryFn: () => patrolLogApi.getRecentPatrolLog(),
   });
 };
 

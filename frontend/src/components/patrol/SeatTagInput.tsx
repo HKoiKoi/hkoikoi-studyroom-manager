@@ -24,7 +24,8 @@ export const SeatTagInput = ({
     const num = parseInt(inputValue.trim(), 10);
 
     if (!isNaN(num) && !seats.includes(num)) {
-      onChange([...seats, num]);
+      const sortedSeats = [...seats, num].sort((a, b) => a - b);
+      onChange(sortedSeats);
     }
 
     setInputValue("");
