@@ -45,6 +45,17 @@ public class PatrolLogService {
 		return PatrolLogResponse.from(patrolLog);
 	}
 
+	public PatrolLogResponse getRecentPatrolLog() {
+
+		LocalDate today = LocalDate.now();
+		LocalDateTime startOfDay = today.atStartOfDay();
+		LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+		return patrolLogRepository.findFirstByCreatedAtBetweenOrderByCreatedAtDesc(startOfDay, endOfDay)
+			.map(PatrolLogResponse::from)
+			.orElse(null);
+	}
+
 	@Transactional
 	public Long createPatrolLog(PatrolLogCreateRequest request) {
 
