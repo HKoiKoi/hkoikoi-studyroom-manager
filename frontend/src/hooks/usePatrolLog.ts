@@ -50,6 +50,7 @@ export const useCreatePatrolLog = () => {
       patrolLogApi.createPatrolLog(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: patrolLogKeys.all });
+      queryClient.removeQueries({ queryKey: patrolLogKeys.recent() });
     },
   });
 };
@@ -68,6 +69,7 @@ export const useMoveAbsentSeat = () => {
     }) => patrolLogApi.moveAbsentSeat(patrolLogId, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: patrolLogKeys.all });
+      queryClient.removeQueries({ queryKey: patrolLogKeys.recent() });
     },
   });
 };
