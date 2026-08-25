@@ -26,20 +26,32 @@ export const SeatBadgeList = ({
         <Icon size={14} />
         {label}
       </span>
+
       <div className="flex flex-wrap gap-1.5">
-        {seats.map((seat) => (
-          <span
-            key={seat}
-            onClick={() => onClickSeat && onClickSeat(seat)}
-            className={`badge ${badgeColor} font-semibold shadow-sm ${
-              onClickSeat
-                ? "cursor-pointer hover:opacity-75 hover:scale-105 transition-all"
-                : ""
-            }`}
-          >
-            {seat}번
-          </span>
-        ))}
+        {seats.map((seat) => {
+          if (onClickSeat) {
+            return (
+              <button
+                key={seat}
+                type="button"
+                onClick={() => onClickSeat(seat)}
+                className={`badge ${badgeColor} font-semibold shadow-sm cursor-pointer hover:opacity-80 active:scale-95 transition-all py-3 px-2.5 min-h-7 select-none touch-manipulation`}
+                aria-label={`${seat}번 좌석 이동 선택`}
+              >
+                {seat}번
+              </button>
+            );
+          }
+
+          return (
+            <span
+              key={seat}
+              className={`badge ${badgeColor} font-semibold shadow-sm py-3 px-2.5 min-h-7`}
+            >
+              {seat}번
+            </span>
+          );
+        })}
       </div>
     </div>
   );

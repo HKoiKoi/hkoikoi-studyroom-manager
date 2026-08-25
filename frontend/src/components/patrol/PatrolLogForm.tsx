@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { alertUtils } from "@/utils/alertUtils";
 import type { ErrorResponse } from "@/types/common";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useDraftStore } from "@/store/useDraftStore";
 import { useCreatePatrolLog } from "@/hooks/usePatrolLog";
 import { SeatTagInput } from "@/components/patrol/SeatTagInput";
 import type {
@@ -26,80 +27,52 @@ interface PatrolLogFormProps {
   recentData?: PatrolLogResponse | null;
 }
 
-const DRAFT_KEY = "patrol_log_draft";
-
 export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
   const navigate = useNavigate();
   const { mutateAsync: createPatrolLog, isPending } = useCreatePatrolLog();
 
-  // 로컬 스토리지에서 저장된 임시저장 데이터 불러오기
-  const savedDraft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+  // Zustand 스토어 상태 및 액션 가져오기
+  const {
+    standingSeats,
+    cafeZoneSeats,
+    drowsySeats,
+    absentSeats,
+    memo,
+    isDraftValid,
+    updateDraft,
+    clearDraft,
+  } = useDraftStore();
 
-  // 상태 관리
-  const [standingSeats, setStandingSeats] = useState<number[]>(() => {
-    if (savedDraft?.standingSeats) {
-      return savedDraft.standingSeats;
-    }
-
-    const seats = recentData?.standingSeats || [];
-
-    return [...seats].sort((a, b) => a - b);
-  });
-  const [cafeZoneSeats, setCafeZoneSeats] = useState<number[]>(() => {
-    if (savedDraft?.cafeZoneSeats) {
-      return savedDraft.cafeZoneSeats;
-    }
-
-    const seats = recentData?.cafeZoneSeats || [];
-
-    return [...seats].sort((a, b) => a - b);
-  });
-  const [drowsySeats, setDrowsySeats] = useState<number[]>(
-    savedDraft?.drowsySeats || [],
-  );
-  const [absentSeats, setAbsentSeats] = useState<number[]>(
-    savedDraft?.absentSeats || [],
-  );
-  const [memo, setMemo] = useState<string>(savedDraft?.memo || "");
   const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
+  const hasInitialized = useRef(false);
 
-  const isDraftRestored = !!savedDraft;
-  const hasRecentSeats = !!(
-    (recentData?.standingSeats && recentData.standingSeats.length > 0) ||
-    (recentData?.cafeZoneSeats && recentData.cafeZoneSeats.length > 0)
-  );
-  const hasNotified = useRef(false);
-  const isSubmitted = useRef(false);
-
-  // 페이지 로드 시 임시저장 데이터가 존재하면 불러왔다는 알림, 이전 순찰 일지의 좌석 데이터가 있다면 직전 순찰 일지의 좌석 데이터를 불러왔다는 알림을 한 번만 표시
+  // 초기 데이터 세팅 및 알림
   useEffect(() => {
-    if (hasNotified.current) return;
+    if (hasInitialized.current) return;
 
-    if (isDraftRestored) {
+    if (isDraftValid) {
       alertUtils.toastSuccess("작성 중이던 일지를 불러왔습니다.");
-    } else if (hasRecentSeats) {
-      alertUtils.toastSuccess(
-        "직전 순찰 일지의 스탠딩, 카페존 좌석을 불러왔습니다.",
-      );
+    } else if (recentData) {
+      const recentStanding = recentData.standingSeats || [];
+      const recentCafe = recentData.cafeZoneSeats || [];
+
+      const hasRecentSeats = recentStanding.length > 0 || recentCafe.length > 0;
+
+      // 직전 일지의 데이터를 스토어에 세팅
+      updateDraft({
+        standingSeats: [...recentStanding].sort((a, b) => a - b),
+        cafeZoneSeats: [...recentCafe].sort((a, b) => a - b),
+      });
+
+      if (hasRecentSeats) {
+        alertUtils.toastSuccess(
+          "직전 순찰 일지의 스탠딩, 카페존 좌석을 불러왔습니다.",
+        );
+      }
     }
 
-    hasNotified.current = true;
-  }, [isDraftRestored, hasRecentSeats]);
-
-  // 임시저장 기능: 상태가 변경될 때마다 로컬 스토리지에 저장
-  useEffect(() => {
-    if (isSubmitted.current) return;
-
-    const draftData = {
-      standingSeats,
-      cafeZoneSeats,
-      drowsySeats,
-      absentSeats,
-      memo,
-    };
-
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
-  }, [standingSeats, cafeZoneSeats, drowsySeats, absentSeats, memo]);
+    hasInitialized.current = true;
+  }, [recentData, isDraftValid, updateDraft]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -138,7 +111,8 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
   ];
 
   const addRoutineTask = (task: string) => {
-    setMemo((prev) => (prev ? `${prev}\n${task}` : task));
+    const newMemo = memo ? `${memo}\n${task}` : task;
+    updateDraft({ memo: newMemo });
   };
 
   const handleSave = async () => {
@@ -162,9 +136,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
       const response = await createPatrolLog(requestData);
 
       if (response.result) {
-        isSubmitted.current = true;
-        localStorage.removeItem(DRAFT_KEY);
-
+        clearDraft();
         alertUtils.toastSuccess("순찰 일지가 성공적으로 저장되었습니다.");
         navigate("/patrol");
       }
@@ -229,28 +201,28 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
                 label="스탠딩 좌석"
                 icon={Armchair}
                 seats={standingSeats}
-                onChange={setStandingSeats}
+                onChange={(seats) => updateDraft({ standingSeats: seats })}
                 badgeColor="badge-primary"
               />
               <SeatTagInput
                 label="카페존 좌석"
                 icon={Coffee}
                 seats={cafeZoneSeats}
-                onChange={setCafeZoneSeats}
+                onChange={(seats) => updateDraft({ cafeZoneSeats: seats })}
                 badgeColor="badge-secondary"
               />
               <SeatTagInput
                 label="졸음 및 딴짓"
                 icon={Moon}
                 seats={drowsySeats}
-                onChange={setDrowsySeats}
+                onChange={(seats) => updateDraft({ drowsySeats: seats })}
                 badgeColor="badge-warning"
               />
               <SeatTagInput
                 label="자리비움"
                 icon={UserMinus}
                 seats={absentSeats}
-                onChange={setAbsentSeats}
+                onChange={(seats) => updateDraft({ absentSeats: seats })}
                 badgeColor="badge-accent"
               />
             </div>
@@ -283,7 +255,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
                 className="textarea textarea-bordered w-full h-32 text-base leading-relaxed focus:textarea-primary"
                 placeholder="추가적인 특이사항을 자유롭게 입력해주세요."
                 value={memo}
-                onChange={(e) => setMemo(e.target.value)}
+                onChange={(e) => updateDraft({ memo: e.target.value })}
               />
             </div>
           </div>
