@@ -205,9 +205,9 @@ export const PatrolLogList = () => {
 
       {/* 좌석 이동 모달 */}
       {selectedSeat && (
-        <div className="modal modal-open modal-bottom sm:modal-middle">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4 text-center">
+        <div className="modal modal-open modal-bottom sm:modal-middle z-50">
+          <div className="modal-box relative z-10 p-5 sm:p-6 pb-8 sm:pb-6">
+            <h3 className="font-bold text-lg mb-2 text-center">
               <span className="text-error">{selectedSeat.seatNumber}번</span>{" "}
               좌석 이동
             </h3>
@@ -217,24 +217,37 @@ export const PatrolLogList = () => {
 
             <div className="flex flex-col gap-3">
               <button
-                className="btn btn-primary"
+                type="button"
+                className="btn btn-primary w-full h-12 text-base touch-manipulation"
                 onClick={() => handleMoveSeat("STANDING")}
                 disabled={isMoving}
               >
-                <Armchair size={18} /> 스탠딩으로 이동
+                {isMoving ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <Armchair size={18} />
+                )}
+                스탠딩으로 이동
               </button>
               <button
-                className="btn btn-secondary"
+                type="button"
+                className="btn btn-secondary w-full h-12 text-base touch-manipulation"
                 onClick={() => handleMoveSeat("CAFE_ZONE")}
                 disabled={isMoving}
               >
-                <Coffee size={18} /> 카페존으로 이동
+                {isMoving ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <Coffee size={18} />
+                )}
+                카페존으로 이동
               </button>
             </div>
 
-            <div className="modal-action">
+            <div className="modal-action mt-4">
               <button
-                className="btn w-full"
+                type="button"
+                className="btn btn-ghost w-full"
                 onClick={() => setSelectedSeat(null)}
                 disabled={isMoving}
               >
@@ -245,7 +258,7 @@ export const PatrolLogList = () => {
 
           {/* 모달 바깥 영역 클릭 시 닫기 */}
           <div
-            className="modal-backdrop"
+            className="modal-backdrop bg-black/40"
             onClick={() => setSelectedSeat(null)}
           ></div>
         </div>
