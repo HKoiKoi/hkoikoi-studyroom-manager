@@ -38,7 +38,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
     drowsySeats,
     absentSeats,
     memo,
-    isDraftValid,
+    hasUserEdited,
     updateDraft,
     clearDraft,
   } = useDraftStore();
@@ -50,18 +50,18 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
   useEffect(() => {
     if (hasInitialized.current) return;
 
-    if (isDraftValid) {
+    if (hasUserEdited) {
       alertUtils.toastSuccess("작성 중이던 일지를 불러왔습니다.");
     } else if (recentData) {
       const recentStanding = recentData.standingSeats || [];
       const recentCafe = recentData.cafeZoneSeats || [];
-
       const hasRecentSeats = recentStanding.length > 0 || recentCafe.length > 0;
 
       // 직전 일지의 데이터를 스토어에 세팅
       updateDraft({
         standingSeats: [...recentStanding].sort((a, b) => a - b),
         cafeZoneSeats: [...recentCafe].sort((a, b) => a - b),
+        hasUserEdited: false,
       });
 
       if (hasRecentSeats) {
@@ -72,7 +72,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
     }
 
     hasInitialized.current = true;
-  }, [recentData, isDraftValid, updateDraft]);
+  }, [recentData, hasUserEdited, updateDraft]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -112,7 +112,7 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
 
   const addRoutineTask = (task: string) => {
     const newMemo = memo ? `${memo}\n${task}` : task;
-    updateDraft({ memo: newMemo });
+    updateDraft({ memo: newMemo, hasUserEdited: true });
   };
 
   const handleSave = async () => {
@@ -201,28 +201,36 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
                 label="스탠딩 좌석"
                 icon={Armchair}
                 seats={standingSeats}
-                onChange={(seats) => updateDraft({ standingSeats: seats })}
+                onChange={(seats) =>
+                  updateDraft({ standingSeats: seats, hasUserEdited: true })
+                }
                 badgeColor="badge-primary"
               />
               <SeatTagInput
                 label="카페존 좌석"
                 icon={Coffee}
                 seats={cafeZoneSeats}
-                onChange={(seats) => updateDraft({ cafeZoneSeats: seats })}
+                onChange={(seats) =>
+                  updateDraft({ cafeZoneSeats: seats, hasUserEdited: true })
+                }
                 badgeColor="badge-secondary"
               />
               <SeatTagInput
                 label="졸음 및 딴짓"
                 icon={Moon}
                 seats={drowsySeats}
-                onChange={(seats) => updateDraft({ drowsySeats: seats })}
+                onChange={(seats) =>
+                  updateDraft({ drowsySeats: seats, hasUserEdited: true })
+                }
                 badgeColor="badge-warning"
               />
               <SeatTagInput
                 label="자리비움"
                 icon={UserMinus}
                 seats={absentSeats}
-                onChange={(seats) => updateDraft({ absentSeats: seats })}
+                onChange={(seats) =>
+                  updateDraft({ absentSeats: seats, hasUserEdited: true })
+                }
                 badgeColor="badge-accent"
               />
             </div>
@@ -255,7 +263,9 @@ export const PatrolLogForm = ({ recentData }: PatrolLogFormProps) => {
                 className="textarea textarea-bordered w-full h-32 text-base leading-relaxed focus:textarea-primary"
                 placeholder="추가적인 특이사항을 자유롭게 입력해주세요."
                 value={memo}
-                onChange={(e) => updateDraft({ memo: e.target.value })}
+                onChange={(e) =>
+                  updateDraft({ memo: e.target.value, hasUserEdited: true })
+                }
               />
             </div>
           </div>
